@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kubernetes-dashboard.fullname" . }}
+  labels:
+    k8s-app: {{ include "kubernetes-dashboard.fullname" . }}
+{{ include "kubernetes-dashboard.labels" . | indent 4 }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 8443
+      protocol: TCP
+      name: http
+  selector:
+    k8s-app: {{ include "kubernetes-dashboard.fullname" . }}
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: {{ include "kubernetes-dashboard.fullname" . }}-metrics-scraper
+  name: {{ include "kubernetes-dashboard.fullname" . }}-metrics-scraper
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - port: {{.Values.metrics.port}}
+      targetPort: 8000
+  selector:
+    k8s-app: {{ include "kubernetes-dashboard.fullname" . }}-metrics-scraper
+
